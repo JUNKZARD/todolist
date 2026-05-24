@@ -85,24 +85,28 @@ export default function PanduFlow() {
 
   // [UPDATE]
   const toggleComplete = async (id: number, currentStatus: boolean) => {
+    const previousTodos = [...todos];
+    setTodos(todos.filter((t) => t.id !== id));
     const { error } = await supabase
       .from("todos")
       .update({ completed: !currentStatus })
       .eq("id", id);
-
-    if (!error) {
-      setTodos(
-        todos.map((t) =>
-          t.id === id ? { ...t, completed: !currentStatus } : t
-        )
-      );
+    if (error) {
+      console.error("Gagal memperbarui database:", error.message);
+      setTodos(previousTodos);
+      alert("Koneksi gagal, silakan coba lagi!");
     }
   };
 
-  // [DELETE]
+  // DELETE
   const deleteTodo = async (id: number) => {
+    const previousTodos = [...todos];
+    setTodos(todos.filter((t) => t.id !== id));
     const { error } = await supabase.from("todos").delete().eq("id", id);
-    if (!error) setTodos(todos.filter((t) => t.id !== id));
+    if (error) {
+      console.error("Gagal menghapus data:", error.message);
+      setTodos(previousTodos);
+    }
   };
 
   // Fungsi Keluar Sistem
@@ -129,7 +133,7 @@ export default function PanduFlow() {
           <header className="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
               <h1 className="text-4xl font-black text-indigo-700 tracking-tight">
-                PanduFlow.
+                Todo List App
               </h1>
               <p className="text-slate-500 font-medium italic">
                 Logged in as: {session.user?.email}
