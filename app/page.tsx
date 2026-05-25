@@ -133,7 +133,7 @@ export default function PanduFlow() {
           <header className="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
               <h1 className="text-4xl font-black text-indigo-700 tracking-tight">
-                Todo List App
+                To do List App
               </h1>
               <p className="text-slate-500 font-medium italic">
                 Logged in as: {session.user?.email}

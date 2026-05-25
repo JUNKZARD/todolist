@@ -24,10 +24,15 @@ export default function AuthForm({ onSessionActive }: AuthFormProps) {
       if (error) {
         setMessage(`❌ ${error.message}`);
       } else {
-        setMessage("✅ Registrasi berhasil! Silakan cek email kamu untuk konfirmasi atau coba langsung masuk.");
+        setMessage(
+          "✅ Registrasi berhasil! Silakan cek email kamu untuk konfirmasi atau coba langsung masuk."
+        );
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
         setMessage(`❌ ${error.message}`);
       } else {
@@ -43,12 +48,16 @@ export default function AuthForm({ onSessionActive }: AuthFormProps) {
         {isRegister ? "Buat Akun" : "Selamat Datang"}
       </h2>
       <p className="text-slate-500 text-sm text-center mb-6">
-        {isRegister ? "Daftar untuk mulai mengelola tugas kuliahmu." : "Masuk ke akun PanduFlow milikmu."}
+        {isRegister
+          ? "Daftar untuk mulai mengelola tugas kuliahmu."
+          : "Masuk ke akun To Do List milikmu."}
       </p>
 
       <form onSubmit={handleAuth} className="space-y-4">
         <div>
-          <label className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Email</label>
+          <label className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">
+            Email
+          </label>
           <input
             type="email"
             className="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -59,7 +68,9 @@ export default function AuthForm({ onSessionActive }: AuthFormProps) {
           />
         </div>
         <div>
-          <label className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Password</label>
+          <label className="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">
+            Password
+          </label>
           <input
             type="password"
             className="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -79,14 +90,20 @@ export default function AuthForm({ onSessionActive }: AuthFormProps) {
         </button>
       </form>
 
-      {message && <p className="mt-4 text-sm text-center font-medium text-slate-600">{message}</p>}
+      {message && (
+        <p className="mt-4 text-sm text-center font-medium text-slate-600">
+          {message}
+        </p>
+      )}
 
       <div className="mt-6 text-center">
         <button
           onClick={() => setIsRegister(!isRegister)}
           className="text-sm font-semibold text-indigo-600 hover:underline"
         >
-          {isRegister ? "Sudah punya akun? Masuk di sini" : "Belum punya akun? Daftar di sini"}
+          {isRegister
+            ? "Sudah punya akun? Masuk di sini"
+            : "Belum punya akun? Daftar di sini"}
         </button>
       </div>
     </div>
