@@ -5,8 +5,8 @@ import { supabase } from "../lib/supabase";
 import AuthForm from "./components/AuthForm";
 import TodoForm from "./components/TodoForm";
 import TodoList from "./components/TodoList";
-// 1. Import tipe data Session resmi dari SDK Supabase
 import { Session } from "@supabase/supabase-js";
+import { toast } from "react-hot-toast";
 
 interface Todo {
   id: number;
@@ -18,13 +18,11 @@ interface Todo {
 }
 
 export default function PanduFlow() {
-  // 2. Ganti tipe <any> menjadi <Session | null> agar sesuai standar TypeScript
   const [session, setSession] = useState<Session | null>(null);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [authChecking, setAuthChecking] = useState(true);
 
-  // 1. Validasi Sesi Pengguna secara Real-Time
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -40,7 +38,6 @@ export default function PanduFlow() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // 2. Muat Data Otomatis saat Sesi Terdeteksi
   useEffect(() => {
     if (session?.user) {
       fetchTodos();
