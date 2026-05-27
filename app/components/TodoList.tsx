@@ -35,7 +35,7 @@ export default function TodoList({
     return (
       <div className="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
         <p className="text-slate-400">
-          Semua tugas beres, Gung! Waktunya istirahat.
+          Semua tugas beres, Waktunya istirahat.
         </p>
       </div>
     );
