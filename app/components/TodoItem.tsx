@@ -55,7 +55,7 @@ export default function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
               ? new Date(todo.dead_line).toLocaleString("id-ID", {
                   dateStyle: "medium",
                   timeStyle: "short",
-                  timeZone: "Asia/Jakarta",
+                  timeZone: "Asia/Makassar",
                 })
               : "Tidak ada tenggat"}
           </p>

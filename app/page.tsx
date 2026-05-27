@@ -23,6 +23,7 @@ export default function PanduFlow() {
   const [loading, setLoading] = useState(true);
   const [authChecking, setAuthChecking] = useState(true);
 
+  // 1. Validasi Sesi Pengguna secara Real-Time
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -38,6 +39,7 @@ export default function PanduFlow() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // 2. Muat Data Otomatis saat Sesi Terdeteksi
   useEffect(() => {
     if (session?.user) {
       fetchTodos();
@@ -50,11 +52,48 @@ export default function PanduFlow() {
     const { data, error } = await supabase
       .from("todos")
       .select("*")
+      .eq("completed", false)
       .order("id", { ascending: false });
 
-    if (!error && data) setTodos(data);
+    if (!error && data) {
+      setTodos(data);
+      // Jalankan pengecekan notifikasi di sini
+      cekTenggatWaktuTugas(data);
+    }
     setLoading(false);
   }
+
+  // Fungsi Pengecekan Notifikasi Waktu Kritis & Expired
+  const cekTenggatWaktuTugas = (daftarTugas: Todo[]) => {
+    const sekarang = new Date().getTime();
+
+    daftarTugas.forEach((todo) => {
+      if (!todo.dead_line) return;
+
+      const dateObj = new Date(todo.dead_line);
+      const waktuTenggat = dateObj.getTime();
+      const selisihWaktu = waktuTenggat - sekarang;
+
+      // 1. Jika tugas sudah LEWAT/EXPIRED
+      if (selisihWaktu < 0) {
+        toast.error(`⚠️ Tugas "${todo.text}"  melewati batas waktu!`, {
+          duration: 6000,
+          id: `expired-${todo.id}`, // Cegah pop-up ganda
+        });
+      }
+      // 2. Jika tugas KRITIS (Kurang dari 2 jam lagi)
+      else if (selisihWaktu > 0 && selisihWaktu <= 2 * 60 * 60 * 1000) {
+        toast(
+          `⏰ Pengingat: Tugas "${todo.text}" akan berakhir kurang dari 2 jam lagi!`,
+          {
+            icon: "⏳",
+            duration: 6000,
+            id: `kritis-${todo.id}`,
+          }
+        );
+      }
+    });
+  };
 
   // [CREATE]
   const handleAdd = async (
@@ -64,13 +103,15 @@ export default function PanduFlow() {
   ) => {
     if (!session?.user) return;
 
+    const formattedDeadline = new Date(deadline).toISOString();
+
     const { data, error } = await supabase
       .from("todos")
       .insert([
         {
           text: task,
           priority,
-          dead_line: deadline,
+          dead_line: formattedDeadline,
           completed: false,
           user_id: session.user.id,
         },
@@ -80,29 +121,34 @@ export default function PanduFlow() {
     if (!error && data) setTodos([data[0], ...todos]);
   };
 
-  // [UPDATE]
+  // [UPDATE] - Optimistic Update
   const toggleComplete = async (id: number, currentStatus: boolean) => {
     const previousTodos = [...todos];
+    // Langsung hilangkan dari UI
     setTodos(todos.filter((t) => t.id !== id));
+
     const { error } = await supabase
       .from("todos")
       .update({ completed: !currentStatus })
       .eq("id", id);
+
     if (error) {
       console.error("Gagal memperbarui database:", error.message);
-      setTodos(previousTodos);
+      setTodos(previousTodos); // Rollback jika error
       alert("Koneksi gagal, silakan coba lagi!");
     }
   };
 
-  // DELETE
+  // [DELETE] - Optimistic Update
   const deleteTodo = async (id: number) => {
     const previousTodos = [...todos];
+    // Langsung hilangkan dari UI
     setTodos(todos.filter((t) => t.id !== id));
+
     const { error } = await supabase.from("todos").delete().eq("id", id);
     if (error) {
       console.error("Gagal menghapus data:", error.message);
-      setTodos(previousTodos);
+      setTodos(previousTodos); // Rollback jika error
     }
   };
 
@@ -112,6 +158,7 @@ export default function PanduFlow() {
     setTodos([]);
   };
 
+  // Layar Loading Awal
   if (authChecking) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500 font-medium animate-pulse">
@@ -120,6 +167,7 @@ export default function PanduFlow() {
     );
   }
 
+  // Tampilan Utama
   return (
     <main className="min-h-screen bg-slate-100 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800">
       {!session ? (
