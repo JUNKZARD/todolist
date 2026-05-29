@@ -23,6 +23,36 @@ export default function PanduFlow() {
   const [loading, setLoading] = useState(true);
   const [authChecking, setAuthChecking] = useState(true);
 
+  // --- DARK MODE ---
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDarkMode(true);
+    }
+  };
+  // --- DARK MODE ---
+
   // 1. Validasi Sesi Pengguna secara Real-Time
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -169,7 +199,8 @@ export default function PanduFlow() {
 
   // Tampilan Utama
   return (
-    <main className="min-h-screen bg-slate-100 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800">
+    // 💡 Perhatikan tambahan class "dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300"
+    <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
       {!session ? (
         <AuthForm onSessionActive={fetchTodos} />
       ) : (
@@ -177,19 +208,28 @@ export default function PanduFlow() {
           {/* Dashboard Header */}
           <header className="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <h1 className="text-4xl font-black text-indigo-700 tracking-tight">
+              <h1 className="text-4xl font-black text-indigo-700 dark:text-indigo-400 tracking-tight">
                 To do List App
               </h1>
-              <p className="text-slate-500 font-medium italic">
+              <p className="text-slate-500 dark:text-slate-400 font-medium italic">
                 Logged in as: {session.user?.email}
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-100 hover:bg-red-200 text-red-600 font-bold px-5 py-2 rounded-2xl text-sm transition-all"
-            >
-              Logout
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={toggleDarkMode}
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold px-4 py-2 rounded-2xl text-sm transition-all shadow-sm"
+              >
+                {isDarkMode ? "☀️ Light" : "🌙 Dark"}
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="bg-red-100 hover:bg-red-200 text-red-600 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-400 font-bold px-5 py-2 rounded-2xl text-sm transition-all"
+              >
+                Logout
+              </button>
+            </div>
           </header>
 
           <TodoForm onAdd={handleAdd} />
