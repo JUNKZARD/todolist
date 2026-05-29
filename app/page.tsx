@@ -24,21 +24,19 @@ export default function PanduFlow() {
   const [authChecking, setAuthChecking] = useState(true);
 
   // --- DARK MODE ---
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const savedTheme = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+  const systemPrefersDark = typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initialDarkMode = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+
+  const [isDarkMode, setIsDarkMode] = useState(initialDarkMode);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
-      setIsDarkMode(true);
+    if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
-      setIsDarkMode(false);
       document.documentElement.classList.remove("dark");
     }
-  }, []);
+  }, [isDarkMode]);
 
   const toggleDarkMode = () => {
     if (isDarkMode) {
@@ -74,7 +72,7 @@ export default function PanduFlow() {
     if (session?.user) {
       fetchTodos();
     }
-  }, [session]);
+  }, [session, fetchTodos]);
 
   // [READ]
   async function fetchTodos() {
