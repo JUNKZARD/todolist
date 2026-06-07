@@ -5,7 +5,7 @@ interface Todo {
   text: string;
   completed: boolean;
   priority: string;
-  dead_line: string; // Menyesuaikan snake_case nama kolom database kamu
+  dead_line: string; 
 }
 
 interface TodoItemProps {

@@ -24,9 +24,13 @@ export default function PanduFlow() {
   const [authChecking, setAuthChecking] = useState(true);
 
   // --- DARK MODE ---
-  const savedTheme = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
-  const systemPrefersDark = typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const initialDarkMode = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+  const savedTheme =
+    typeof window !== "undefined" ? localStorage.getItem("theme") : null;
+  const systemPrefersDark =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initialDarkMode =
+    savedTheme === "dark" || (!savedTheme && systemPrefersDark);
 
   const [isDarkMode, setIsDarkMode] = useState(initialDarkMode);
 
@@ -91,7 +95,7 @@ export default function PanduFlow() {
     setLoading(false);
   }
 
-  // Fungsi Pengecekan Notifikasi Waktu Kritis & Expired
+  // Fungsi Pengecekan Notifikasi Expired
   const cekTenggatWaktuTugas = (daftarTugas: Todo[]) => {
     const sekarang = new Date().getTime();
 
@@ -109,7 +113,7 @@ export default function PanduFlow() {
           id: `expired-${todo.id}`, // Cegah pop-up ganda
         });
       }
-      // 2. Jika tugas KRITIS (Kurang dari 2 jam lagi)
+      // Jika tugas KRITIS
       else if (selisihWaktu > 0 && selisihWaktu <= 2 * 60 * 60 * 1000) {
         toast(
           `⏰ Pengingat: Tugas "${todo.text}" akan berakhir kurang dari 2 jam lagi!`,
@@ -152,7 +156,7 @@ export default function PanduFlow() {
   // [UPDATE] - Optimistic Update
   const toggleComplete = async (id: number, currentStatus: boolean) => {
     const previousTodos = [...todos];
-    // Langsung hilangkan dari UI
+
     setTodos(todos.filter((t) => t.id !== id));
 
     const { error } = await supabase
@@ -170,7 +174,7 @@ export default function PanduFlow() {
   // [DELETE] - Optimistic Update
   const deleteTodo = async (id: number) => {
     const previousTodos = [...todos];
-    // Langsung hilangkan dari UI
+
     setTodos(todos.filter((t) => t.id !== id));
 
     const { error } = await supabase.from("todos").delete().eq("id", id);
@@ -186,7 +190,7 @@ export default function PanduFlow() {
     setTodos([]);
   };
 
-  // Layar Loading Awal
+
   if (authChecking) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500 font-medium animate-pulse">
@@ -197,13 +201,12 @@ export default function PanduFlow() {
 
   // Tampilan Utama
   return (
-    // 💡 Perhatikan tambahan class "dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300"
-    <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
+       <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
       {!session ? (
         <AuthForm onSessionActive={fetchTodos} />
       ) : (
         <div className="w-full max-w-3xl">
-          {/* Dashboard Header */}
+
           <header className="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
               <h1 className="text-4xl font-black text-indigo-700 dark:text-indigo-400 tracking-tight">
