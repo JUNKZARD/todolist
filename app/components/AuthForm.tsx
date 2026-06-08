@@ -61,7 +61,7 @@ export default function AuthForm({ onSessionActive }: AuthFormProps) {
           <input
             type="email"
             className="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-            placeholder="nama@kampus.com"
+            placeholder="nama@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required

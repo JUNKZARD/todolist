@@ -23,7 +23,7 @@ export default function TodoForm({ onAdd }: TodoFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           className="md:col-span-3 p-4 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 placeholder-slate-400 dark:placeholder-slate-400 text-slate-800 dark:text-slate-100 transition-colors"
-          placeholder="Apa tugas kamu hari ini?"
+          placeholder="Apa kegiatan kamu hari ini?"
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
