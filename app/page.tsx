@@ -55,7 +55,6 @@ export default function PanduFlow() {
   };
   // --- DARK MODE ---
 
-  // 1. Validasi Sesi Pengguna secara Real-Time
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -70,14 +69,12 @@ export default function PanduFlow() {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // 2. Muat Data Otomatis saat Sesi Terdeteksi
   useEffect(() => {
     if (session?.user) {
       fetchTodos();
     }
-  }, [session, fetchTodos]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
   // [READ]
   async function fetchTodos() {
     setLoading(true);
@@ -89,13 +86,12 @@ export default function PanduFlow() {
 
     if (!error && data) {
       setTodos(data);
-      // Jalankan pengecekan notifikasi di sini
       cekTenggatWaktuTugas(data);
     }
     setLoading(false);
   }
 
-  // Fungsi Pengecekan Notifikasi Expired
+  // Pengecekan Notifikasi Expired
   const cekTenggatWaktuTugas = (daftarTugas: Todo[]) => {
     const sekarang = new Date().getTime();
 
@@ -106,15 +102,12 @@ export default function PanduFlow() {
       const waktuTenggat = dateObj.getTime();
       const selisihWaktu = waktuTenggat - sekarang;
 
-      // 1. Jika tugas sudah LEWAT/EXPIRED
       if (selisihWaktu < 0) {
         toast.error(`⚠️ Tugas "${todo.text}"  melewati batas waktu!`, {
           duration: 6000,
-          id: `expired-${todo.id}`, // Cegah pop-up ganda
+          id: `expired-${todo.id}`,
         });
-      }
-      // Jika tugas KRITIS
-      else if (selisihWaktu > 0 && selisihWaktu <= 2 * 60 * 60 * 1000) {
+      } else if (selisihWaktu > 0 && selisihWaktu <= 2 * 60 * 60 * 1000) {
         toast(
           `⏰ Pengingat: Tugas "${todo.text}" akan berakhir kurang dari 2 jam lagi!`,
           {
@@ -127,7 +120,7 @@ export default function PanduFlow() {
     });
   };
 
-  // [CREATE]
+  // CREATE
   const handleAdd = async (
     task: string,
     priority: string,
@@ -153,7 +146,7 @@ export default function PanduFlow() {
     if (!error && data) setTodos([data[0], ...todos]);
   };
 
-  // [UPDATE] - Optimistic Update
+  // UPDATE
   const toggleComplete = async (id: number, currentStatus: boolean) => {
     const previousTodos = [...todos];
 
@@ -171,7 +164,7 @@ export default function PanduFlow() {
     }
   };
 
-  // [DELETE] - Optimistic Update
+  // DELETE
   const deleteTodo = async (id: number) => {
     const previousTodos = [...todos];
 
@@ -190,7 +183,6 @@ export default function PanduFlow() {
     setTodos([]);
   };
 
-
   if (authChecking) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-500 font-medium animate-pulse">
@@ -199,14 +191,12 @@ export default function PanduFlow() {
     );
   }
 
-  // Tampilan Utama
   return (
-       <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
+    <main className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors duration-300 p-4 md:p-10 flex flex-col items-center justify-center text-slate-800 dark:text-slate-100">
       {!session ? (
         <AuthForm onSessionActive={fetchTodos} />
       ) : (
         <div className="w-full max-w-3xl">
-
           <header className="mb-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
               <h1 className="text-4xl font-black text-indigo-700 dark:text-indigo-400 tracking-tight">
